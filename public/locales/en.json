@@ -9,3 +9,12 @@
   "language": "Language",
   "dark_mode": "Dark Mode"
 }
+
+{
+  "login_title": "Sign In",
+  "login_subtitle": "Access the Garden Shop System",
+  "username_label": "Username",
+  "password_label": "Password",
+  "login_button": "Sign In",
+  "login_error": "Invalid credentials. Please try again."
+}
