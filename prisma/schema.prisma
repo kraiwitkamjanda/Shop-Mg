@@ -13,6 +13,7 @@ model Store {
   location  String?
   createdAt DateTime  @default(now())
   users     User[]
+  products Product[]
 }
 
 model User {
@@ -25,4 +26,53 @@ model User {
   createdAt    DateTime @default(now())
 
   store Store @relation(fields: [storeId], references: [id])
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name_en     String
+  name_th     String
+  products    Product[]
+}
+
+model Product {
+  id               Int             @id @default(autoincrement())
+  storeId          Int
+  categoryId       Int
+  sku              String          @unique
+  barcode          String?         @unique
+  name_en          String
+  name_th          String
+  desc_en          String?
+  desc_th          String?
+  cost             Float           @default(0.0)
+  price            Float           @default(0.0)
+  quantity         Int             @default(0)
+  alertThreshold   Int             @default(5)
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+
+  store            Store           @relation(fields: [storeId], references: [id])
+  category         Category        @relation(fields: [categoryId], references: [id])
+  images           ProductImage[]
+  movements        StockMovement[]
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  url       String
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model StockMovement {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  type      String
+  quantity  Int
+  reason    String?
+  createdAt DateTime @default(now())
+
+  product   Product  @relation(fields: [productId], references: [id])
 }
