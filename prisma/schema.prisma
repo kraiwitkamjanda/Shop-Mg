@@ -14,6 +14,7 @@ model Store {
   createdAt DateTime  @default(now())
   users     User[]
   products Product[]
+  sales Sale[]
 }
 
 model User {
@@ -26,6 +27,7 @@ model User {
   createdAt    DateTime @default(now())
 
   store Store @relation(fields: [storeId], references: [id])
+  sales Sale[]
 }
 
 model Category {
@@ -56,6 +58,8 @@ model Product {
   category         Category        @relation(fields: [categoryId], references: [id])
   images           ProductImage[]
   movements        StockMovement[]
+  saleItems        SaleItem[]
+  purchaseItems PurchaseOrderItem[]
 }
 
 model ProductImage {
@@ -75,4 +79,85 @@ model StockMovement {
   createdAt DateTime @default(now())
 
   product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Sale {
+  id              Int        @id @default(autoincrement())
+  invoiceNo       String     @unique
+  storeId         Int
+  userId          Int        // Cashier
+  customerName    String?    @default("General Customer")
+  subtotal        Float
+  discount        Float      @default(0)
+  tax             Float      @default(0)
+  total           Float
+  paymentStatus   String     @default("PAID") // PAID, PENDING, CANCELLED
+  paymentMethod   String     @default("CASH") // CASH, PROMPTPAY, CARD
+  createdAt       DateTime   @default(now())
+
+  store           Store      @relation(fields: [storeId], references: [id])
+  user            User       @relation(fields: [userId], references: [id])
+  items           SaleItem[]
+}
+
+model SaleItem {
+  id        Int     @id @default(autoincrement())
+  saleId    Int
+  productId Int
+  quantity  Int
+  unitPrice Float
+  totalPrice Float
+
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Employee {
+  id          Int      @id @default(autoincrement())
+  userId      Int?     @unique // Link to User login if they have one
+  name        String
+  phone       String?
+  email       String?
+  role        String   // owner, manager, cashier, staff
+  salary      Float    @default(0)
+  hireDate    DateTime @default(now())
+  isActive    Boolean  @default(true)
+  pos         PurchaseOrder[]
+}
+
+model Supplier {
+  id          Int             @id @default(autoincrement())
+  companyName String
+  contactName String?
+  phone       String
+  email       String?
+  address     String?
+  notes       String?
+  pos         PurchaseOrder[]
+}
+
+model PurchaseOrder {
+  id          Int                 @id @default(autoincrement())
+  poNumber    String              @unique
+  supplierId  Int
+  employeeId  Int
+  status      String              @default("PENDING") // PENDING, RECEIVED, CANCELLED
+  totalAmount Float               @default(0)
+  createdAt   DateTime            @default(now())
+  
+  supplier    Supplier            @relation(fields: [supplierId], references: [id])
+  employee    Employee            @relation(fields: [employeeId], references: [id])
+  items       PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id          Int           @id @default(autoincrement())
+  poId        Int
+  productId   Int
+  quantity    Int
+  cost        Float
+  totalCost   Float
+
+  po          PurchaseOrder @relation(fields: [poId], references: [id])
+  product     Product       @relation(fields: [productId], references: [id])
 }

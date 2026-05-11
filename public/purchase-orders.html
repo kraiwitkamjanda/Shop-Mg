@@ -1,0 +1,34 @@
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold" data-i18n="purchase_orders">Purchase Orders</h2>
+        <button onclick="showCreatePOModal()" class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600">
+            + New PO
+        </button>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                <tr>
+                    <th class="p-4">PO Number</th>
+                    <th class="p-4">Supplier</th>
+                    <th class="p-4">Total</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="po-table-body">
+                <!-- Row Example -->
+                <tr class="border-b dark:border-gray-700">
+                    <td class="p-4 font-mono">PO-1704500123</td>
+                    <td class="p-4">Green Valley Nursery</td>
+                    <td class="p-4">฿12,500.00</td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">PENDING</span>
+                    </td>
+                    <td class="p-4 text-brand-500 cursor-pointer" onclick="receiveItems(1)">Receive</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
