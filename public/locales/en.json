@@ -1,0 +1,11 @@
+{
+  "app_title": "Garden Shop System",
+  "welcome_message": "Welcome back",
+  "dashboard": "Dashboard",
+  "products": "Products",
+  "pos": "Point of Sale",
+  "inventory": "Inventory",
+  "settings": "Settings",
+  "language": "Language",
+  "dark_mode": "Dark Mode"
+}

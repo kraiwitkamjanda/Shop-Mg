@@ -1,0 +1,11 @@
+{
+  "app_title": "ระบบจัดการร้านต้นไม้",
+  "welcome_message": "ยินดีต้อนรับกลับมา",
+  "dashboard": "แดชบอร์ด",
+  "products": "สินค้า",
+  "pos": "จุดขาย (POS)",
+  "inventory": "คลังสินค้า",
+  "settings": "การตั้งค่า",
+  "language": "ภาษา",
+  "dark_mode": "โหมดมืด"
+}

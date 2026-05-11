@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id        Int       @id @default(autoincrement())
+  name      String
+  location  String?
+  createdAt DateTime  @default(now())
+  users     User[]
+  products  Product[]
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   // Admin, Manager, Cashier, Landscaper
+  users     User[]
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  storeId      Int
+  roleId       Int
+  username     String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id])
+  role  Role  @relation(fields: [roleId], references: [id])
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  category_en String
+  category_th String
+  products    Product[]
+}
+
+model Product {
+  id               Int      @id @default(autoincrement())
+  storeId          Int
+  categoryId       Int
+  sku              String   @unique
+  barcode          String?  @unique
+  name_en          String
+  name_th          String
+  price            Float
+  cost             Float
+  careInstructions String?
+  seasonality      String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  store    Store    @relation(fields: [storeId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+}

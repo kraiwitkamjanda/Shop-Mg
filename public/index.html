@@ -1,0 +1,86 @@
+ <!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app_title">Garden Shop System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0fdf4', 500: '#22c55e', 900: '#14532d' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200 flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+            <i class="fa-solid fa-leaf text-brand-500 text-xl mr-3"></i>
+            <span class="font-bold text-lg tracking-wide" data-i18n="app_title">Garden Shop</span>
+        </div>
+        <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+            <a href="#" class="flex items-center px-4 py-3 bg-brand-50 dark:bg-brand-900/30 text-brand-500 rounded-lg">
+                <i class="fa-solid fa-chart-pie w-6"></i>
+                <span data-i18n="dashboard">Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                <i class="fa-solid fa-cash-register w-6"></i>
+                <span data-i18n="pos">POS</span>
+            </a>
+            <!-- Additional links will be added in future phases -->
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6">
+            <h1 class="text-xl font-semibold" data-i18n="welcome_message">Welcome back</h1>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+                
+                <!-- Language Select -->
+                <select id="lang-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                    <option value="en">🇺🇸 EN</option>
+                    <option value="th">🇹🇭 TH</option>
+                </select>
+
+                <!-- User Profile Dropdown (Placeholder) -->
+                <div class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold">
+                    A
+                </div>
+            </div>
+        </header>
+
+        <!-- Main View Area -->
+        <main id="app-content" class="flex-1 p-6 overflow-y-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Placeholder Cards to test styling -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Daily Sales</h3>
+                    <p class="text-2xl font-bold mt-2">฿0.00</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html> 
