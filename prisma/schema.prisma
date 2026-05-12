@@ -86,6 +86,9 @@ model Sale {
   invoiceNo       String     @unique
   storeId         Int
   userId          Int        // Cashier
+  customerId Int?
+
+  customer    Customer? @relation(fields: [customerId], references: [id])
   customerName    String?    @default("General Customer")
   subtotal        Float
   discount        Float      @default(0)
@@ -160,4 +163,65 @@ model PurchaseOrderItem {
 
   po          PurchaseOrder @relation(fields: [poId], references: [id])
   product     Product       @relation(fields: [productId], references: [id])
+}
+
+model Customer {
+  id            Int                @id @default(autoincrement())
+  name          String
+  phone         String             @unique
+  email         String?
+  lineUserId    String?            @unique
+  tier          String             @default("BRONZE")
+  totalSpend    Float              @default(0)
+  points        Int                @default(0)
+  birthday      DateTime?
+  createdAt     DateTime           @default(now())
+
+  sales         Sale[]
+  pointLogs     LoyaltyPoint[]
+  activities    CustomerActivity[]
+  coupons       CustomerCoupon[]
+}
+
+model LoyaltyPoint {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  points      Int
+  reason      String
+  createdAt   DateTime @default(now())
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+}
+
+model Coupon {
+  id            Int              @id @default(autoincrement())
+  code          String           @unique
+  discountType  String
+  value         Float
+  expiryDate    DateTime
+  usageLimit    Int              @default(100)
+  isActive      Boolean          @default(true)
+
+  customers     CustomerCoupon[]
+}
+
+model CustomerCoupon {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  couponId    Int
+  isUsed      Boolean  @default(false)
+  usedAt      DateTime?
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+  coupon      Coupon   @relation(fields: [couponId], references: [id])
+}
+
+model CustomerActivity {
+  id          Int      @id @default(autoincrement())
+  customerId  Int
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+
+  customer    Customer @relation(fields: [customerId], references: [id])
 }
