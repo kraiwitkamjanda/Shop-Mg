@@ -38,28 +38,48 @@ model Category {
 }
 
 model Product {
-  id               Int             @id @default(autoincrement())
-  storeId          Int
-  categoryId       Int
-  sku              String          @unique
-  barcode          String?         @unique
-  name_en          String
-  name_th          String
-  desc_en          String?
-  desc_th          String?
-  cost             Float           @default(0.0)
-  price            Float           @default(0.0)
-  quantity         Int             @default(0)
-  alertThreshold   Int             @default(5)
-  isActive         Boolean         @default(true)
-  createdAt        DateTime        @default(now())
 
-  store            Store           @relation(fields: [storeId], references: [id])
-  category         Category        @relation(fields: [categoryId], references: [id])
+  id               Int                 @id @default(autoincrement())
+
+  storeId          Int
+
+  categoryId       Int
+
+  sku              String              @unique
+
+  barcode          String?             @unique
+
+  name_en          String
+
+  name_th          String
+
+  desc_en          String?
+
+  desc_th          String?
+
+  cost             Float               @default(0.0)
+
+  price            Float               @default(0.0)
+
+  quantity         Int                 @default(0)
+
+  alertThreshold   Int                 @default(5)
+
+  isActive         Boolean             @default(true)
+
+  createdAt        DateTime            @default(now())
+
+  store            Store               @relation(fields: [storeId], references: [id])
+
+  category         Category            @relation(fields: [categoryId], references: [id])
+
   images           ProductImage[]
+
   movements        StockMovement[]
+
   saleItems        SaleItem[]
-  purchaseItems PurchaseOrderItem[]
+
+  purchaseItems    PurchaseOrderItem[]
 }
 
 model ProductImage {

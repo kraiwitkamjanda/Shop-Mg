@@ -7,6 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 // Add this near your other requires
 const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
 const poRoutes = require('./routes/poRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
@@ -15,6 +16,7 @@ const supplierRoutes = require('./routes/supplierRoutes');
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
 app.use('/api/po', poRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/suppliers', supplierRoutes);
