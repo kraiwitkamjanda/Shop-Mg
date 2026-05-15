@@ -175,12 +175,39 @@ exports.deleteProduct = async (req, res) => {
 
         const productId = parseInt(req.params.id);
 
-        await prisma.product.delete({
+        // Delete related images
+        await prisma.productImage.deleteMany({
+            where: {
+                productId: productId
+            }
+        });
 
+        // Delete stock movements
+        await prisma.stockMovement.deleteMany({
+            where: {
+                productId: productId
+            }
+        });
+
+        // Delete sale items
+        await prisma.saleItem.deleteMany({
+            where: {
+                productId: productId
+            }
+        });
+
+        // Delete purchase order items
+        await prisma.purchaseOrderItem.deleteMany({
+            where: {
+                productId: productId
+            }
+        });
+
+        // Finally delete product
+        await prisma.product.delete({
             where: {
                 id: productId
             }
-
         });
 
         res.json({

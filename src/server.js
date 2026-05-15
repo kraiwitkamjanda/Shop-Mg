@@ -11,12 +11,14 @@ const productRoutes = require('./routes/productRoutes');
 const poRoutes = require('./routes/poRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 // Add this below your app.use(express.json())
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/po', poRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/suppliers', supplierRoutes);
