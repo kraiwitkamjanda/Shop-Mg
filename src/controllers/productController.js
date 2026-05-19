@@ -82,8 +82,6 @@ exports.createProduct = async (req, res) => {
 
                 price: parseFloat(data.price || 0),
 
-                cost: parseFloat(data.cost),
-
                 cost: parseFloat(data.cost || 0),
 
                 // Initial stock movement

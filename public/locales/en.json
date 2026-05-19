@@ -5,12 +5,15 @@
   "products": "Products",
   "pos": "Point of Sale",
   "inventory": "Inventory",
+  "purchase_orders": "Purchase Orders",
+  "customers": "Customers",
+  "reports": "Reports",
   "settings": "Settings",
   "language": "Language",
-  "dark_mode": "Dark Mode"
-}
-
-{
+  "dark_mode": "Dark Mode",
+  "daily_sales": "Daily Sales",
+  "total_products": "Total Products",
+  "low_stock_alerts": "Low Stock Alerts",
   "login_title": "Sign In",
   "login_subtitle": "Access the Garden Shop System",
   "username_label": "Username",

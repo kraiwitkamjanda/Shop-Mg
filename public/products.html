@@ -1,116 +1,628 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Products</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products — Garden Shop</title>
+    <script src="/js/guard.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            500: '#22c55e'
-                        }
+                        brand: { 50: '#f0fdf4', 500: '#22c55e', 900: '#14532d' }
                     }
                 }
             }
         }
     </script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .modal-backdrop { backdrop-filter: blur(4px); }
+        .fade-in { animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200 flex h-screen overflow-hidden">
 
-<body class="bg-gray-100 dark:bg-gray-900 p-6">
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
+            <i class="fa-solid fa-leaf text-brand-500 text-xl mr-3"></i>
+            <span class="font-bold text-lg tracking-wide">Garden Shop</span>
+        </div>
+        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+            <a href="/index.html"    class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-chart-pie w-5 text-center"></i><span data-i18n="dashboard">Dashboard</span></a>
+            <a href="/pos.html"      class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-cash-register w-5 text-center"></i><span data-i18n="pos">POS</span></a>
+            <a href="/products.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-box w-5 text-center"></i><span data-i18n="products">Products</span></a>
+            <a href="/inventory.html"        class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-warehouse w-5 text-center"></i><span data-i18n="inventory">Inventory</span></a>
+            <a href="/purchase-orders.html"  class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-truck w-5 text-center"></i><span data-i18n="purchase_orders">Purchase Orders</span></a>
+            <a href="/customers.html"        class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-users w-5 text-center"></i><span data-i18n="customers">Customers</span></a>
+            <a href="/analytics.html"        class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-chart-line w-5 text-center"></i><span data-i18n="reports">Reports</span></a>
+        </nav>
+        <div class="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
 
+    <!-- ===================== MAIN ===================== -->
+    <div class="flex-1 flex flex-col overflow-hidden">
 
-    <!-- HEADER -->
-    <div class="flex justify-between items-center mb-6">
+        <!-- Header -->
+        <header class="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 shrink-0">
+            <h1 class="text-xl font-semibold">Products</h1>
+            <div class="flex items-center gap-3">
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+                <div id="user-badge" class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-sm">A</div>
+            </div>
+        </header>
 
-        <h2 class="text-2xl font-bold dark:text-white">
-            Products
-        </h2>
+        <!-- Content -->
+        <main class="flex-1 p-6 overflow-y-auto">
 
-        <button
-            onclick="openModal()"
-            class="bg-brand-500 text-white px-4 py-2 rounded-lg">
+            <!-- Toolbar -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-6">
 
-            Add Product
+                <!-- Search -->
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input id="search-input" type="text" placeholder="Search by name or SKU..."
+                           class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600
+                                  bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
 
-        </button>
+                <!-- Category Filter -->
+                <select id="category-filter"
+                        class="px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600
+                               bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="">All Categories</option>
+                </select>
 
+                <!-- Add Button -->
+                <button onclick="openAddModal()"
+                        class="flex items-center gap-2 px-4 py-2.5 bg-brand-500 hover:bg-green-600
+                               text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i>
+                    Add Product
+                </button>
+
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Total Products</p>
+                    <p id="stat-total" class="text-2xl font-bold mt-1">—</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Active</p>
+                    <p id="stat-active" class="text-2xl font-bold mt-1 text-brand-500">—</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Low Stock</p>
+                    <p id="stat-low" class="text-2xl font-bold mt-1 text-yellow-500">—</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Out of Stock</p>
+                    <p id="stat-out" class="text-2xl font-bold mt-1 text-red-500">—</p>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                <th class="text-left px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">SKU</th>
+                                <th class="text-left px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Name</th>
+                                <th class="text-left px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Category</th>
+                                <th class="text-right px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Price</th>
+                                <th class="text-right px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Cost</th>
+                                <th class="text-right px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Stock</th>
+                                <th class="text-center px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Status</th>
+                                <th class="text-center px-4 py-3 text-gray-500 dark:text-gray-400 font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-list">
+                            <tr>
+                                <td colspan="8" class="text-center py-12 text-gray-400">
+                                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                                    <p>Loading products...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+                    <p id="pagination-info" class="text-sm text-gray-500 dark:text-gray-400">—</p>
+                    <div class="flex gap-2">
+                        <button id="btn-prev" onclick="changePage(-1)"
+                                class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600
+                                       hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-next" onclick="changePage(1)"
+                                class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600
+                                       hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
+    <!-- ===================== ADD / EDIT MODAL ===================== -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden modal-backdrop bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg fade-in">
 
-    <!-- FILTERS -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl mb-6 flex gap-4">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                <h2 id="modal-title" class="text-lg font-semibold">Add Product</h2>
+                <button onclick="closeModal()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa-solid fa-xmark text-gray-500"></i>
+                </button>
+            </div>
 
-        <input
-            type="text"
-            id="search"
-            placeholder="Search SKU/Name..."
-            class="border p-2 rounded w-full dark:bg-gray-700 dark:text-white">
+            <!-- Modal Body -->
+            <div class="px-6 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
 
-        <select
-            id="category-filter"
-            class="border p-2 rounded dark:bg-gray-700 dark:text-white">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">SKU *</label>
+                        <input id="field-sku" type="text" placeholder="PLT-001"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Barcode</label>
+                        <input id="field-barcode" type="text" placeholder="Optional"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
 
-            <option value="">
-                All Categories
-            </option>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name (EN) *</label>
+                        <input id="field-name-en" type="text" placeholder="Rose Bush"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name (TH) *</label>
+                        <input id="field-name-th" type="text" placeholder="กุหลาบ"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
 
-        </select>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Category *</label>
+                    <select id="field-category"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="">Select category</option>
+                    </select>
+                </div>
 
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Price (฿) *</label>
+                        <input id="field-price" type="number" min="0" step="0.01" placeholder="0.00"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Cost (฿)</label>
+                        <input id="field-cost" type="number" min="0" step="0.01" placeholder="0.00"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Stock *</label>
+                        <input id="field-quantity" type="number" min="0" placeholder="0"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Low Stock Alert Threshold</label>
+                    <input id="field-threshold" type="number" min="0" placeholder="5"
+                           class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600
+                                  bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Error message -->
+                <p id="modal-error" class="hidden text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg"></p>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+                <button onclick="closeModal()"
+                        class="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600
+                               hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    Cancel
+                </button>
+                <button id="modal-submit" onclick="submitProduct()"
+                        class="px-4 py-2 text-sm font-medium rounded-lg bg-brand-500 hover:bg-green-600
+                               text-white transition-colors flex items-center gap-2">
+                    <i id="submit-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+                    <span id="submit-label">Save Product</span>
+                </button>
+            </div>
+
+        </div>
     </div>
 
+    <!-- ===================== SCRIPTS ===================== -->
+    <script>
+        // ใช้ var แทน const เพื่อไม่ชนกับ guard.js ที่ declare token ไว้แล้ว
+        var token = localStorage.getItem('token');
+        var user  = JSON.parse(localStorage.getItem('user') || '{}');
 
-    <!-- PRODUCT TABLE -->
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
+        // User badge
+        if (user.username) {
+            document.getElementById('user-badge').textContent = user.username[0].toUpperCase();
+        }
 
-        <table class="w-full text-left">
+        // Active nav
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            const linkPage = link.getAttribute('href').replace('/', '');
+            if (linkPage === currentPage) {
+                link.classList.remove('text-gray-600', 'dark:text-gray-400');
+                link.classList.add('bg-brand-50', 'dark:bg-green-900/30', 'text-brand-500', 'font-medium');
+            }
+        });
 
-            <thead class="border-b dark:border-gray-700">
+        // Theme toggle
+        if (localStorage.getItem('color-theme') === 'dark' ||
+            (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
 
-                <tr>
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
 
-                    <th class="p-4">SKU</th>
+        // =====================
+        // STATE
+        // =====================
+        let allProducts  = [];
+        let categories   = [];
+        let editingId    = null;
+        let currentPage_ = 1;
+        const PAGE_SIZE  = 15;
 
-                    <th class="p-4">Name</th>
+        // =====================
+        // LOAD CATEGORIES
+        // =====================
+        async function loadCategories() {
+            try {
+                const res  = await fetch('/api/categories', { headers: { Authorization: `Bearer ${token}` } });
+                if (!res.ok) return;
+                categories = await res.json();
 
-                    <th class="p-4">Stock</th>
+                // Populate filter dropdown
+                const filter = document.getElementById('category-filter');
+                // Populate modal dropdown
+                const field  = document.getElementById('field-category');
 
-                    <th class="p-4">Price</th>
+                categories.forEach(cat => {
+                    filter.innerHTML += `<option value="${cat.id}">${cat.name_en}</option>`;
+                    field.innerHTML  += `<option value="${cat.id}">${cat.name_en}</option>`;
+                });
+            } catch (e) {
+                console.error('loadCategories:', e);
+            }
+        }
 
-                    <th class="p-4">Actions</th>
+        // =====================
+        // LOAD PRODUCTS
+        // =====================
+        async function loadProducts() {
+            const search     = document.getElementById('search-input').value;
+            const categoryId = document.getElementById('category-filter').value;
 
-                </tr>
+            let url = `/api/products?search=${encodeURIComponent(search)}`;
+            if (categoryId) url += `&categoryId=${categoryId}`;
 
-            </thead>
+            try {
+                const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
 
-            <tbody id="product-list">
+                if (!res.ok) {
+                    const err = await res.json();
+                    document.getElementById('product-list').innerHTML =
+                        `<tr><td colspan="8" class="text-center py-8 text-red-500">Error: ${err.message}</td></tr>`;
+                    return;
+                }
 
-                <!-- Dynamic rows -->
+                allProducts  = await res.json();
+                currentPage_ = 1;
+                renderTable();
+                renderStats();
+            } catch (e) {
+                console.error('loadProducts:', e);
+            }
+        }
 
-            </tbody>
+        // =====================
+        // RENDER TABLE
+        // =====================
+        function renderTable() {
+            const start    = (currentPage_ - 1) * PAGE_SIZE;
+            const paginated = allProducts.slice(start, start + PAGE_SIZE);
+            const total    = allProducts.length;
+            const totalPages = Math.ceil(total / PAGE_SIZE);
 
-        </table>
+            // Pagination info
+            document.getElementById('pagination-info').textContent =
+                total === 0 ? 'No products found'
+                            : `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, total)} of ${total}`;
 
-    </div>
+            document.getElementById('btn-prev').disabled = currentPage_ <= 1;
+            document.getElementById('btn-next').disabled = currentPage_ >= totalPages;
 
+            if (paginated.length === 0) {
+                document.getElementById('product-list').innerHTML =
+                    `<tr><td colspan="8" class="text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-box-open text-3xl mb-2 block"></i>
+                        No products found
+                    </td></tr>`;
+                return;
+            }
 
-    <!-- SCRIPTS -->
-    <script src="/js/guard.js"></script>
+            document.getElementById('product-list').innerHTML = paginated.map(p => {
+                const isLow  = p.quantity > 0 && p.quantity <= p.alertThreshold;
+                const isOut  = p.quantity === 0;
+                const stockColor = isOut  ? 'text-red-500 font-semibold'
+                                 : isLow  ? 'text-yellow-500 font-semibold'
+                                 :          'text-gray-700 dark:text-gray-300';
+                const statusBadge = p.isActive
+                    ? `<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Active</span>`
+                    : `<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-700">Inactive</span>`;
 
-    <script src="/js/products.js"></script>
+                return `
+                    <tr class="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                        <td class="px-4 py-3 font-mono text-xs text-gray-500">${p.sku}</td>
+                        <td class="px-4 py-3">
+                            <p class="font-medium">${p.name_en}</p>
+                            <p class="text-xs text-gray-400">${p.name_th}</p>
+                        </td>
+                        <td class="px-4 py-3 text-gray-500 text-xs">${p.category?.name_en || '—'}</td>
+                        <td class="px-4 py-3 text-right font-medium">฿${Number(p.price).toLocaleString()}</td>
+                        <td class="px-4 py-3 text-right text-gray-500">฿${Number(p.cost).toLocaleString()}</td>
+                        <td class="px-4 py-3 text-right ${stockColor}">${p.quantity}</td>
+                        <td class="px-4 py-3 text-center">${statusBadge}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="openEditModal(${p.id})"
+                                        class="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                        title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deleteProduct(${p.id})"
+                                        class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // =====================
+        // RENDER STATS
+        // =====================
+        function renderStats() {
+            const total  = allProducts.length;
+            const active = allProducts.filter(p => p.isActive).length;
+            const low    = allProducts.filter(p => p.quantity > 0 && p.quantity <= p.alertThreshold).length;
+            const out    = allProducts.filter(p => p.quantity === 0).length;
+
+            document.getElementById('stat-total').textContent  = total;
+            document.getElementById('stat-active').textContent = active;
+            document.getElementById('stat-low').textContent    = low;
+            document.getElementById('stat-out').textContent    = out;
+        }
+
+        function changePage(dir) {
+            currentPage_ += dir;
+            renderTable();
+        }
+
+        // =====================
+        // MODAL — ADD
+        // =====================
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modal-title').textContent   = 'Add Product';
+            document.getElementById('submit-label').textContent  = 'Save Product';
+            clearModalFields();
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        // =====================
+        // MODAL — EDIT
+        // =====================
+        function openEditModal(id) {
+            const p = allProducts.find(x => x.id === id);
+            if (!p) return;
+
+            editingId = id;
+            document.getElementById('modal-title').textContent  = 'Edit Product';
+            document.getElementById('submit-label').textContent = 'Update Product';
+
+            document.getElementById('field-sku').value       = p.sku;
+            document.getElementById('field-barcode').value   = p.barcode || '';
+            document.getElementById('field-name-en').value   = p.name_en;
+            document.getElementById('field-name-th').value   = p.name_th;
+            document.getElementById('field-category').value  = p.categoryId;
+            document.getElementById('field-price').value     = p.price;
+            document.getElementById('field-cost').value      = p.cost;
+            document.getElementById('field-quantity').value  = p.quantity;
+            document.getElementById('field-threshold').value = p.alertThreshold;
+
+            document.getElementById('modal-error').classList.add('hidden');
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function clearModalFields() {
+            ['field-sku','field-barcode','field-name-en','field-name-th',
+             'field-price','field-cost','field-quantity','field-threshold'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('field-category').value = '';
+            document.getElementById('modal-error').classList.add('hidden');
+        }
+
+        // =====================
+        // SUBMIT (ADD / EDIT)
+        // =====================
+        async function submitProduct() {
+            const sku       = document.getElementById('field-sku').value.trim();
+            const name_en   = document.getElementById('field-name-en').value.trim();
+            const name_th   = document.getElementById('field-name-th').value.trim();
+            const categoryId = document.getElementById('field-category').value;
+            const price     = document.getElementById('field-price').value;
+            const cost      = document.getElementById('field-cost').value;
+            const quantity  = document.getElementById('field-quantity').value;
+            const threshold = document.getElementById('field-threshold').value;
+            const barcode   = document.getElementById('field-barcode').value.trim();
+
+            // Validate
+            if (!sku || !name_en || !name_th || !categoryId || !price || quantity === '') {
+                showModalError('Please fill in all required fields.');
+                return;
+            }
+
+            const body = {
+                sku, name_en, name_th,
+                categoryId: parseInt(categoryId),
+                price:      parseFloat(price),
+                cost:       parseFloat(cost || 0),
+                quantity:   parseInt(quantity),
+                alertThreshold: parseInt(threshold || 5),
+                ...(barcode && { barcode })
+            };
+
+            setSubmitLoading(true);
+
+            try {
+                const url    = editingId ? `/api/products/${editingId}` : '/api/products';
+                const method = editingId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type':  'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showModalError(data.error || data.message || 'Something went wrong.');
+                    return;
+                }
+
+                closeModal();
+                loadProducts();
+
+            } catch (e) {
+                showModalError('Network error. Please try again.');
+            } finally {
+                setSubmitLoading(false);
+            }
+        }
+
+        function showModalError(msg) {
+            const el = document.getElementById('modal-error');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function setSubmitLoading(loading) {
+            document.getElementById('submit-spinner').classList.toggle('hidden', !loading);
+            document.getElementById('modal-submit').disabled = loading;
+        }
+
+        // =====================
+        // DELETE
+        // =====================
+        async function deleteProduct(id) {
+            if (!confirm('Delete this product? This cannot be undone.')) return;
+
+            try {
+                const res = await fetch(`/api/products/${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    alert('Delete failed: ' + (err.error || err.message));
+                    return;
+                }
+
+                loadProducts();
+            } catch (e) {
+                alert('Network error.');
+            }
+        }
+
+        // =====================
+        // SEARCH & FILTER
+        // =====================
+        let searchTimer;
+        document.getElementById('search-input').addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(loadProducts, 350); // debounce 350ms
+        });
+
+        document.getElementById('category-filter').addEventListener('change', loadProducts);
+
+        // Close modal on backdrop click
+        document.getElementById('product-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // =====================
+        // INIT
+        // =====================
+        loadCategories();
+        loadProducts();
+    </script>
 
 </body>
-
 </html>

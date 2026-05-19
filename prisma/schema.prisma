@@ -7,80 +7,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============================================================
+// STORE
+// ============================================================
+
 model Store {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
   location  String?
-  createdAt DateTime  @default(now())
+  createdAt DateTime   @default(now())
+
   users     User[]
-  products Product[]
-  sales Sale[]
+  products  Product[]
+  sales     Sale[]
+  employees Employee[] // เพิ่ม: ผูก Employee กับ Store
 }
+
+// ============================================================
+// USER
+// ============================================================
 
 model User {
   id           Int      @id @default(autoincrement())
-  storeId      Int
+  storeId      Int?     // แก้: Int → Int? (optional ป้องกัน error ตอน register)
   username     String   @unique
   passwordHash String
   role         String   @default("staff") // owner, manager, cashier, staff
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
 
-  store Store @relation(fields: [storeId], references: [id])
-  sales Sale[]
+  store        Store?   @relation(fields: [storeId], references: [id]) // แก้: Store → Store?
+  sales        Sale[]
 }
+
+// ============================================================
+// CATEGORY
+// ============================================================
 
 model Category {
-  id          Int       @id @default(autoincrement())
-  name_en     String
-  name_th     String
-  products    Product[]
+  id       Int       @id @default(autoincrement())
+  name_en  String
+  name_th  String
+
+  products Product[]
 }
+
+// ============================================================
+// PRODUCT
+// ============================================================
 
 model Product {
+  id             Int                 @id @default(autoincrement())
+  storeId        Int
+  categoryId     Int
+  sku            String              @unique
+  barcode        String?             @unique
+  name_en        String
+  name_th        String
+  desc_en        String?
+  desc_th        String?
+  cost           Float               @default(0.0)
+  price          Float               @default(0.0)
+  quantity       Int                 @default(0)
+  alertThreshold Int                 @default(5)
+  isActive       Boolean             @default(true)
+  createdAt      DateTime            @default(now())
 
-  id               Int                 @id @default(autoincrement())
-
-  storeId          Int
-
-  categoryId       Int
-
-  sku              String              @unique
-
-  barcode          String?             @unique
-
-  name_en          String
-
-  name_th          String
-
-  desc_en          String?
-
-  desc_th          String?
-
-  cost             Float               @default(0.0)
-
-  price            Float               @default(0.0)
-
-  quantity         Int                 @default(0)
-
-  alertThreshold   Int                 @default(5)
-
-  isActive         Boolean             @default(true)
-
-  createdAt        DateTime            @default(now())
-
-  store            Store               @relation(fields: [storeId], references: [id])
-
-  category         Category            @relation(fields: [categoryId], references: [id])
-
-  images           ProductImage[]
-
-  movements        StockMovement[]
-
-  saleItems        SaleItem[]
-
-  purchaseItems    PurchaseOrderItem[]
+  store          Store               @relation(fields: [storeId], references: [id])
+  category       Category            @relation(fields: [categoryId], references: [id])
+  images         ProductImage[]
+  movements      StockMovement[]
+  saleItems      SaleItem[]
+  purchaseItems  PurchaseOrderItem[]
 }
+
+// ============================================================
+// PRODUCT IMAGE
+// ============================================================
 
 model ProductImage {
   id        Int     @id @default(autoincrement())
@@ -90,63 +93,85 @@ model ProductImage {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
+// ============================================================
+// STOCK MOVEMENT
+// ============================================================
+
 model StockMovement {
   id        Int      @id @default(autoincrement())
   productId Int
-  type      String
+  type      String   // IN, OUT, ADJUST
   quantity  Int
   reason    String?
   createdAt DateTime @default(now())
 
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // เพิ่ม: Cascade
 }
+
+// ============================================================
+// SALE
+// ============================================================
 
 model Sale {
-  id              Int        @id @default(autoincrement())
-  invoiceNo       String     @unique
-  storeId         Int
-  userId          Int        // Cashier
-  customerId Int?
+  id            Int        @id @default(autoincrement())
+  invoiceNo     String     @unique // เพิ่ม: เลขที่ใบเสร็จ
+  storeId       Int
+  userId        Int
+  customerId    Int?
+  customerName  String?    // เพิ่ม: ชื่อลูกค้า walk-in ที่ไม่ได้ลงทะเบียน
+  totalAmount   Float
+  discount      Float      @default(0)
+  finalAmount   Float
+  paymentMethod String     @default("cash") // cash, transfer, card
+  status        String     @default("completed") // completed, voided, refunded
+  createdAt     DateTime   @default(now())
 
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  customerName    String?    @default("General Customer")
-  subtotal        Float
-  discount        Float      @default(0)
-  tax             Float      @default(0)
-  total           Float
-  paymentStatus   String     @default("PAID") // PAID, PENDING, CANCELLED
-  paymentMethod   String     @default("CASH") // CASH, PROMPTPAY, CARD
-  createdAt       DateTime   @default(now())
-
-  store           Store      @relation(fields: [storeId], references: [id])
-  user            User       @relation(fields: [userId], references: [id])
-  items           SaleItem[]
+  store         Store      @relation(fields: [storeId], references: [id])
+  user          User       @relation(fields: [userId], references: [id])
+  customer      Customer?  @relation(fields: [customerId], references: [id])
+  items         SaleItem[]
 }
+
+// ============================================================
+// SALE ITEM
+// ============================================================
 
 model SaleItem {
-  id        Int     @id @default(autoincrement())
-  saleId    Int
-  productId Int
-  quantity  Int
-  unitPrice Float
+  id         Int      @id @default(autoincrement())
+  saleId     Int
+  productId  Int
+  quantity   Int
+  unitPrice  Float
   totalPrice Float
+  createdAt  DateTime @default(now())
 
-  sale      Sale    @relation(fields: [saleId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)   // เพิ่ม: Cascade
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Restrict) // เพิ่ม: Restrict (ห้ามลบ product ที่มี sale)
 }
+
+// ============================================================
+// EMPLOYEE
+// ============================================================
 
 model Employee {
-  id          Int      @id @default(autoincrement())
-  userId      Int?     @unique // Link to User login if they have one
-  name        String
-  phone       String?
-  email       String?
-  role        String   // owner, manager, cashier, staff
-  salary      Float    @default(0)
-  hireDate    DateTime @default(now())
-  isActive    Boolean  @default(true)
-  pos         PurchaseOrder[]
+  id       Int             @id @default(autoincrement())
+  storeId  Int?            // เพิ่ม: ผูกกับ Store
+  userId   Int?            @unique // Link to User login if they have one
+  name     String
+  phone    String?
+  email    String?
+  role     String          // owner, manager, cashier, staff
+  salary   Float           @default(0)
+  hireDate DateTime        @default(now())
+  isActive Boolean         @default(true)
+
+  store    Store?          @relation(fields: [storeId], references: [id]) // เพิ่ม: relation กลับ Store
+  pos      PurchaseOrder[]
 }
+
+// ============================================================
+// SUPPLIER
+// ============================================================
 
 model Supplier {
   id          Int             @id @default(autoincrement())
@@ -156,8 +181,13 @@ model Supplier {
   email       String?
   address     String?
   notes       String?
+
   pos         PurchaseOrder[]
 }
+
+// ============================================================
+// PURCHASE ORDER
+// ============================================================
 
 model PurchaseOrder {
   id          Int                 @id @default(autoincrement())
@@ -167,81 +197,105 @@ model PurchaseOrder {
   status      String              @default("PENDING") // PENDING, RECEIVED, CANCELLED
   totalAmount Float               @default(0)
   createdAt   DateTime            @default(now())
-  
+
   supplier    Supplier            @relation(fields: [supplierId], references: [id])
   employee    Employee            @relation(fields: [employeeId], references: [id])
   items       PurchaseOrderItem[]
 }
 
-model PurchaseOrderItem {
-  id          Int           @id @default(autoincrement())
-  poId        Int
-  productId   Int
-  quantity    Int
-  cost        Float
-  totalCost   Float
+// ============================================================
+// PURCHASE ORDER ITEM
+// ============================================================
 
-  po          PurchaseOrder @relation(fields: [poId], references: [id])
-  product     Product       @relation(fields: [productId], references: [id])
+model PurchaseOrderItem {
+  id        Int           @id @default(autoincrement())
+  poId      Int
+  productId Int
+  quantity  Int
+  cost      Float
+  totalCost Float
+
+  po        PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)    // เพิ่ม: Cascade
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Restrict) // เพิ่ม: Restrict
 }
+
+// ============================================================
+// CUSTOMER
+// ============================================================
 
 model Customer {
-  id            Int                @id @default(autoincrement())
-  name          String
-  phone         String             @unique
-  email         String?
-  lineUserId    String?            @unique
-  tier          String             @default("BRONZE")
-  totalSpend    Float              @default(0)
-  points        Int                @default(0)
-  birthday      DateTime?
-  createdAt     DateTime           @default(now())
+  id         Int                @id @default(autoincrement())
+  name       String
+  phone      String             @unique
+  email      String?
+  lineUserId String?            @unique
+  tier       String             @default("BRONZE") // BRONZE, SILVER, GOLD, PLATINUM
+  totalSpend Float              @default(0)
+  points     Int                @default(0)
+  birthday   DateTime?
+  createdAt  DateTime           @default(now())
 
-  sales         Sale[]
-  pointLogs     LoyaltyPoint[]
-  activities    CustomerActivity[]
-  coupons       CustomerCoupon[]
+  sales      Sale[]
+  pointLogs  LoyaltyPoint[]
+  activities CustomerActivity[]
+  coupons    CustomerCoupon[]
 }
+
+// ============================================================
+// LOYALTY POINT
+// ============================================================
 
 model LoyaltyPoint {
-  id          Int      @id @default(autoincrement())
-  customerId  Int
-  points      Int
-  reason      String
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  points     Int
+  reason     String
+  createdAt  DateTime @default(now())
 
-  customer    Customer @relation(fields: [customerId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade) // เพิ่ม: Cascade
 }
+
+// ============================================================
+// COUPON
+// ============================================================
 
 model Coupon {
-  id            Int              @id @default(autoincrement())
-  code          String           @unique
-  discountType  String
-  value         Float
-  expiryDate    DateTime
-  usageLimit    Int              @default(100)
-  isActive      Boolean          @default(true)
+  id           Int              @id @default(autoincrement())
+  code         String           @unique
+  discountType String           // PERCENT, FIXED
+  value        Float
+  expiryDate   DateTime
+  usageLimit   Int              @default(100)
+  isActive     Boolean          @default(true)
 
-  customers     CustomerCoupon[]
+  customers    CustomerCoupon[]
 }
+
+// ============================================================
+// CUSTOMER COUPON
+// ============================================================
 
 model CustomerCoupon {
-  id          Int      @id @default(autoincrement())
-  customerId  Int
-  couponId    Int
-  isUsed      Boolean  @default(false)
-  usedAt      DateTime?
+  id         Int       @id @default(autoincrement())
+  customerId Int
+  couponId   Int
+  isUsed     Boolean   @default(false)
+  usedAt     DateTime?
 
-  customer    Customer @relation(fields: [customerId], references: [id])
-  coupon      Coupon   @relation(fields: [couponId], references: [id])
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade) // เพิ่ม: Cascade
+  coupon     Coupon    @relation(fields: [couponId], references: [id])
 }
+
+// ============================================================
+// CUSTOMER ACTIVITY
+// ============================================================
 
 model CustomerActivity {
   id          Int      @id @default(autoincrement())
   customerId  Int
-  type        String
+  type        String   // LOGIN, PURCHASE, REDEEM, COUPON
   description String
   createdAt   DateTime @default(now())
 
-  customer    Customer @relation(fields: [customerId], references: [id])
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade) // เพิ่ม: Cascade
 }

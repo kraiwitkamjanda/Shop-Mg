@@ -5,12 +5,15 @@
   "products": "สินค้า",
   "pos": "จุดขาย (POS)",
   "inventory": "คลังสินค้า",
+  "purchase_orders": "ใบสั่งซื้อ",
+  "customers": "ลูกค้า",
+  "reports": "รายงาน",
   "settings": "การตั้งค่า",
   "language": "ภาษา",
-  "dark_mode": "โหมดมืด"
-}
-
-{
+  "dark_mode": "โหมดมืด",
+  "daily_sales": "ยอดขายวันนี้",
+  "total_products": "สินค้าทั้งหมด",
+  "low_stock_alerts": "สินค้าใกล้หมด",
   "login_title": "เข้าสู่ระบบ",
   "login_subtitle": "เข้าใช้งานระบบจัดการร้านต้นไม้",
   "username_label": "ชื่อผู้ใช้",
